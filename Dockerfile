@@ -3,7 +3,6 @@ FROM python:3.12.10-alpine
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1
 
-# Instalar dependências básicas
 RUN apk add --no-cache build-base
 
 WORKDIR /app
@@ -16,4 +15,4 @@ COPY . .
 
 EXPOSE 5000
 
-CMD ["python", "app.py"]
+CMD ["gunicorn", "-b", "0.0.0.0:5000", "wsgi:app"]
