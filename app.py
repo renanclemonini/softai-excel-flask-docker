@@ -33,8 +33,8 @@ def create_app():
                     if save_location.endswith('.xls'):
                         save_location = converter_xls_para_xlsx(save_location)
 
-                    # arquivo_processado = processar_excel_oficial2(save_location)
-                    arquivo_reduzido = os.path.join('input', f'reduzido_{filename}')
+                    # response = processar_excel_oficial3(save_location)
+                    arquivo_reduzido = os.path.join('input', f'novo_{filename}')
                     copiar_somente_6_colunas(save_location, arquivo_reduzido)
                     response = processar_excel_oficial3(arquivo_reduzido)
                     try:
