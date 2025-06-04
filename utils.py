@@ -430,6 +430,24 @@ def processar_excel_oficial2(arquivo_entrada: str):
         print(f"Arquivo processado com sucesso: {nome_saida}")
         return nome_saida
     
+
+@medidor_tempo(True)
+def copiar_somente_6_colunas(origem_path: str, destino_path: str):
+    wb_origem = load_workbook(origem_path)
+    ws_origem = wb_origem.active
+
+    wb_destino = Workbook()
+    ws_destino = wb_destino.active
+
+    for row_idx, row in enumerate(ws_origem.iter_rows(values_only=True), start=1):
+        # Pega só as 6 primeiras colunas da linha
+        colunas_reduzidas = row[:6]
+        for col_idx, valor in enumerate(colunas_reduzidas, start=1):
+            ws_destino.cell(row=row_idx, column=col_idx, value=valor)
+
+    wb_destino.save(destino_path)
+
+    
 @medidor_tempo(True)
 def processar_excel_oficial3(arquivo_entrada: str):
     with open(arquivo_entrada, 'rb') as f:
@@ -437,7 +455,11 @@ def processar_excel_oficial3(arquivo_entrada: str):
         ws = wb.active
         linhas_originais = ws.max_row
         colunas_originais = ws.max_column
-        headers = [str(cell.value).strip().lower() if cell.value else '' for cell in next(ws.iter_rows(min_row=1, max_row=1))]
+        # headers = [str(cell.value).strip().lower() if cell.value else '' for cell in next(ws.iter_rows(min_row=1, max_row=1))]
+        headers = [
+            str(cell.value).strip().lower() if cell.value else ''
+            for cell in next(ws.iter_rows(min_row=1, max_row=1, max_col=6))
+        ]
         print(f"({len(headers)}) Colunas encontradas: {headers}")
 
         idx = {h: i for i, h in enumerate(headers)}
@@ -446,7 +468,7 @@ def processar_excel_oficial3(arquivo_entrada: str):
         padrao_3_colunas = set(['telefone', 'nome', 'etiquetas']).issubset(set(headers))
         padrao_4_colunas = set(['primeiro nome', 'sobrenome', 'telefone', 'etiquetas']).issubset(set(headers))
         linhas_em_branco = 0
-        for row in ws.iter_rows(min_row=2, values_only=True):
+        for row in ws.iter_rows(min_row=2, max_col=6, values_only=True):
             if all(cell is None or str(cell).strip() == '' for cell in row):
                 linhas_em_branco += 1
                 continue

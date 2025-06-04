@@ -1,5 +1,5 @@
 from flask import Flask, request, render_template, redirect, url_for, send_from_directory, flash
-from utils import allowed_file, converter_xls_para_xlsx, processar_excel_oficial3, limpar_pasta_input
+from utils import allowed_file, converter_xls_para_xlsx, copiar_somente_6_colunas, processar_excel_oficial3, limpar_pasta_input
 from werkzeug.utils import secure_filename
 from uuid import uuid4
 import os
@@ -34,7 +34,9 @@ def create_app():
                         save_location = converter_xls_para_xlsx(save_location)
 
                     # arquivo_processado = processar_excel_oficial2(save_location)
-                    response = processar_excel_oficial3(save_location)
+                    arquivo_reduzido = os.path.join('input', f'reduzido_{filename}')
+                    copiar_somente_6_colunas(save_location, arquivo_reduzido)
+                    response = processar_excel_oficial3(arquivo_reduzido)
                     try:
                         os.remove(save_location)
                     except Exception as e:
